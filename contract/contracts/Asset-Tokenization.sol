@@ -8,7 +8,7 @@ contract AssetTokenization {
     address[] public farmers; //farmer address
     mapping(address => FarmNft) farmerToNftContract; // Relate farmer' address to Farmer's NFT
 
-    struct nftContractDetail {
+    struct nftContractDetails {
         address farmerAddress;
         string farmerName;
         string description;
@@ -57,5 +57,45 @@ contract AssetTokenization {
         );
 
         farmerToNftContract[farmerAddress] = newNft;
+    }
+
+    function getNftContractDetails(
+        address farmerAddress
+    ) public view returns (nftContractDetails memory) {
+        require(availableContract(farmerAddress), "not available");
+
+        nftContractDetails memory details;
+        details = nftContractDetails(
+            farmerToNftContract[farmerAddress].farmerAddress(),
+            farmerToNftContract[farmerAddress].farmerName(),
+            farmerToNftContract[farmerAddress].description(),
+            farmerToNftContract[farmerAddress].totalMint(),
+            farmerToNftContract[farmerAddress].availableMint(),
+            farmerToNftContract[farmerAddress].price(),
+            farmerToNftContract[farmerAddress].expirationDate()
+        );
+
+        return details;
+    }
+
+    function buyNft(address farmerAddress) public payable {
+        require(availableContract(farmerAddress), "Not yet deployed");
+
+        address buyerAddress = msg.sender;
+        farmerToNftContract[farmerAddress].mintNFT{value: msg.value}(
+            buyerAddress
+        );
+    }
+
+    function getBuyers() public view returns (address[] memory) {
+        address farmerAddress = msg.sender;
+
+        require(availableContract(farmerAddress), "Not yet deployed");
+
+        return farmerToNftContract[farmerAddress].getTokenOwners();
+    }
+
+    function getFarmers() public view returns (address[] memory) {
+        return farmers;
     }
 }
