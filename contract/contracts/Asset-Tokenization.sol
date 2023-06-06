@@ -3,8 +3,9 @@ pragma solidity ^0.8.17;
 
 import "./ FarmNft.sol";
 import "hardhat/console.sol";
+import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
-contract AssetTokenization {
+contract AssetTokenization is AutomationCompatibleInterface {
     address[] public farmers; //farmer address
     mapping(address => FarmNft) farmerToNftContract; // Relate farmer' address to Farmer's NFT
 
@@ -97,5 +98,44 @@ contract AssetTokenization {
 
     function getFarmers() public view returns (address[] memory) {
         return farmers;
+    }
+
+    // For upkeep that chainlink automation function
+    // Check whether there are expired contracts
+    // If checkUpKeep() returns true, chainlink automatically runs performUpkeep() that follows bellow
+    function checkUpkeep(
+        bytes calldata
+    )
+        external
+        view
+        override
+        returns (
+            bool upkeepNeeded,
+            bytes memory //memory is optional data. return initial value in this code
+        )
+    {
+        for (uint256 i = 0; i < farmers.length; i++) {
+            address farmer = farmers[i];
+            if (!availableContract(farmer)) {
+                continue;
+            }
+            if (farmerToNftContract[farmer].isExpired()) {
+                return (true, "");
+            }
+        }
+        return (false, "");
+    }
+
+    function performUpkeep(bytes calldata) external override {
+        for (uint256 i = 0; i < farmers.length; i++) {
+            address farmer = farmers[i];
+            if (!availableContract(farmer)) {
+                continue;
+            }
+            if (farmerToNftContract[farmer].isExpired()) {
+                farmerToNftContract[farmer].burnNFT();
+                delete farmerToNftContract[farmer];
+            }
+        }
     }
 }
