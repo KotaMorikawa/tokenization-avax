@@ -1,10 +1,12 @@
+"use client";
+
 import useWallet from "@/hooks/useWallet";
+import React from "react";
 import { createContext, ReactNode } from "react";
 
-const CurrentAccountContext = createContext<[string | undefined, () => void]>([
-  "",
-  () => {},
-]);
+const CurrentAccountContext = React.createContext<
+  [string | undefined, () => void]
+>(["", () => {}]);
 
 export const CurrentAccountProvider = ({
   children,

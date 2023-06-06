@@ -1,3 +1,5 @@
+"use client";
+
 import { getEthereum } from "@/utils/ethereum";
 import { useCallback, useEffect, useState } from "react";
 
