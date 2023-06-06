@@ -58,22 +58,26 @@ export interface AssetTokenizationInterface extends utils.Interface {
   functions: {
     "availableContract(address)": FunctionFragment;
     "buyNft(address)": FunctionFragment;
+    "checkUpkeep(bytes)": FunctionFragment;
     "farmers(uint256)": FunctionFragment;
     "generateNftContract(string,string,uint256,uint256,uint256)": FunctionFragment;
     "getBuyers()": FunctionFragment;
     "getFarmers()": FunctionFragment;
     "getNftContractDetails(address)": FunctionFragment;
+    "performUpkeep(bytes)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "availableContract"
       | "buyNft"
+      | "checkUpkeep"
       | "farmers"
       | "generateNftContract"
       | "getBuyers"
       | "getFarmers"
       | "getNftContractDetails"
+      | "performUpkeep"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -83,6 +87,10 @@ export interface AssetTokenizationInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "buyNft",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkUpkeep",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "farmers",
@@ -107,12 +115,20 @@ export interface AssetTokenizationInterface extends utils.Interface {
     functionFragment: "getNftContractDetails",
     values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "performUpkeep",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "availableContract",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "buyNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "checkUpkeep",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "farmers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "generateNftContract",
@@ -122,6 +138,10 @@ export interface AssetTokenizationInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getFarmers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getNftContractDetails",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "performUpkeep",
     data: BytesLike
   ): Result;
 
@@ -165,6 +185,11 @@ export interface AssetTokenization extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    checkUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { upkeepNeeded: boolean }>;
+
     farmers(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -187,6 +212,11 @@ export interface AssetTokenization extends BaseContract {
       farmerAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[AssetTokenization.NftContractDetailsStructOutput]>;
+
+    performUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
   availableContract(
@@ -198,6 +228,11 @@ export interface AssetTokenization extends BaseContract {
     farmerAddress: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  checkUpkeep(
+    arg0: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<[boolean, string] & { upkeepNeeded: boolean }>;
 
   farmers(
     arg0: PromiseOrValue<BigNumberish>,
@@ -222,6 +257,11 @@ export interface AssetTokenization extends BaseContract {
     overrides?: CallOverrides
   ): Promise<AssetTokenization.NftContractDetailsStructOutput>;
 
+  performUpkeep(
+    arg0: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     availableContract(
       _farmer: PromiseOrValue<string>,
@@ -232,6 +272,11 @@ export interface AssetTokenization extends BaseContract {
       farmerAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    checkUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { upkeepNeeded: boolean }>;
 
     farmers(
       arg0: PromiseOrValue<BigNumberish>,
@@ -255,6 +300,11 @@ export interface AssetTokenization extends BaseContract {
       farmerAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<AssetTokenization.NftContractDetailsStructOutput>;
+
+    performUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {};
@@ -268,6 +318,11 @@ export interface AssetTokenization extends BaseContract {
     buyNft(
       farmerAddress: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    checkUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     farmers(
@@ -292,6 +347,11 @@ export interface AssetTokenization extends BaseContract {
       farmerAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    performUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -303,6 +363,11 @@ export interface AssetTokenization extends BaseContract {
     buyNft(
       farmerAddress: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    checkUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     farmers(
@@ -326,6 +391,11 @@ export interface AssetTokenization extends BaseContract {
     getNftContractDetails(
       farmerAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    performUpkeep(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

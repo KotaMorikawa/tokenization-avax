@@ -1,4 +1,4 @@
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { BigNumber, Overrides } from "ethers";
 import { ethers } from "hardhat";
@@ -114,6 +114,54 @@ describe("Asset-Tokenization", function () {
           .connect(buyer)
           .buyNft(farmer.address, { value: price } as Overrides)
       ).to.changeEtherBalances([farmer, buyer], [price, -price]);
+    });
+  });
+
+  describe("upkeep", function () {
+    it("checkUpkeep and performUpkeep", async function () {
+      const { userAccounts, assetTokenization } = await loadFixture(
+        deployContract
+      );
+
+      // parameter
+      const farmer = userAccounts[0];
+      const farmerName = "farmer";
+      const description = "description";
+      const totalMint = BigNumber.from(5);
+      const price = BigNumber.from(100);
+      const expirationDate = BigNumber.from(Date.now())
+        .div(1000)
+        .add(oneWeekInSecond);
+
+      // deploy nft contract
+      await assetTokenization
+        .connect(farmer)
+        .generateNftContract(
+          farmerName,
+          description,
+          totalMint,
+          price,
+          expirationDate
+        );
+
+      const [return1] = await assetTokenization.checkUpkeep("0x00");
+
+      // return false because expired NFT is nothing now
+      expect(return1).to.equal(false);
+
+      // Change the timestamp of the blockchain (generate a block containing a timestamp 1s after the expiration date) so that the nft contract expires
+      await time.increaseTo(expirationDate.add(1));
+
+      const [return2] = await assetTokenization.checkUpkeep("0x00");
+
+      // return true because there is expired NFT
+      expect(return2).to.equal(true);
+
+      await assetTokenization.performUpkeep("0x00");
+
+      //　Unable to retrieve contract details for the expired NFT.
+      await expect(assetTokenization.getNftContractDetails(farmer.address)).to
+        .be.reverted;
     });
   });
 });
