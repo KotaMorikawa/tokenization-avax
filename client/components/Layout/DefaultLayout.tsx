@@ -13,8 +13,7 @@ const DefaultLayout = ({ children, home }: Props) => {
   const [currentAccount, isLoading, connectWallet] = useContext(
     CurrentAccountContext
   );
-  console.log(isLoading);
-  console.log(currentAccount);
+
   return (
     <div>
       <div className="h-20 flex justify-start items-center text-white px-6">
