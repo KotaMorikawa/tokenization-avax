@@ -10,14 +10,24 @@ type Props = {
 };
 
 const DefaultLayout = ({ children, home }: Props) => {
-  const [currentAccount, connectWallet] = useContext(CurrentAccountContext);
+  const [currentAccount, isLoading, connectWallet] = useContext(
+    CurrentAccountContext
+  );
+  console.log(isLoading);
+  console.log(currentAccount);
   return (
     <div>
       <div className="h-20 flex justify-start items-center text-white px-6">
         <div className="flex">
           <div className="text-2xl font-semibold">Asset Tokenization</div>
         </div>
-        {currentAccount === undefined ? (
+        {isLoading === true && currentAccount === undefined ? (
+          <div className="ml-auto">
+            <div className="bg-gray-800 text-white rounded-md py-2 px-4">
+              Loading...
+            </div>
+          </div>
+        ) : currentAccount === undefined ? (
           <div className="ml-auto">
             <div
               className="ml-4 bg-red-500 text-white rounded-md py-2 px-4 cursor-pointer"

@@ -4,19 +4,21 @@ import useWallet from "@/hooks/useWallet";
 import React from "react";
 import { createContext, ReactNode } from "react";
 
-const CurrentAccountContext = React.createContext<
-  [string | undefined, () => void]
->(["", () => {}]);
+const CurrentAccountContext = createContext<
+  [string | undefined, boolean, () => void]
+>(["", true, () => {}]);
 
 export const CurrentAccountProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const { currentAccount, connectWallet } = useWallet();
+  const { isLoading, currentAccount, connectWallet } = useWallet();
 
   return (
-    <CurrentAccountContext.Provider value={[currentAccount, connectWallet]}>
+    <CurrentAccountContext.Provider
+      value={[currentAccount, isLoading, connectWallet]}
+    >
       {children}
     </CurrentAccountContext.Provider>
   );
